@@ -1,19 +1,16 @@
-import {Component, React} from "react";
-import {Text} from "react-native";
+import React, {Component } from "react";
+import {Text, TextInput} from "react-native";
 
 
-export class LoginScreen extends Component{
-    render(){
-        return (
-            <>
-                    <Text>
-                        Login screen here!!
-                    </Text>
-            </>
+const LoginScreen = () => (
+    <>
+    <Text>
+        <TextInput />
+        Login screen here!!
+    </Text>
+    </>
 
-        )
-        ;
-    }
-}
+);
+
 
 export default LoginScreen;

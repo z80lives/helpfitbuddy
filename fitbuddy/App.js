@@ -3,14 +3,12 @@ import React from 'react';
 import {Text, View} from "react-native";
 import LoginSreen from "./screens/login/login"
 
-const App = () =>
-   (
+const App = () => (
     <>    
-    <View>
-    <LoginSreen></LoginSreen>
+    <View>  
     </View>
     </>
-  );;
+);
 
 
 export default App;

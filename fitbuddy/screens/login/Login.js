@@ -1,16 +1,20 @@
-import React, {Component } from "react";
-import {Text, TextInput} from "react-native";
+import React from 'react';
+import { Text, TextInput, View } from 'react-native';
 
+export default LoginScreen = () => {
+        return (
+          <View style={styles.container}>
+            <Text>Hello, I am...</Text>
+           
+          </View>
+        );
+      }
 
-const LoginScreen = () => (
-    <>
-    <Text>
-        <TextInput />
-        Login screen here!!
-    </Text>
-    </>
-
-);
-
-
-export default LoginScreen;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+});

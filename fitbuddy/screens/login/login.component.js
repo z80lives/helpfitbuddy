@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import {Alert, AsyncStorage, Button, TextInput, View, Text} from 'react-native';
-import {Actions} from 'react-native-router-flux';
+import {Actions, ActionConst} from 'react-native-router-flux';
 import {connect} from 'react-redux';
+
+//import {loginAction} from "redux/actions/index";
 
 class LoginScreen extends Component {
   state = {
@@ -10,18 +12,28 @@ class LoginScreen extends Component {
     isLoading: null,
   };
 
-  //   constructor() {
-  //     super();
-  //     this.state = {
-  //       username: '',
-  //       password: '',
-  //     };
-  //   }
-  componentDidUpdate() {
-    if (this.props.isAuthenticated) {
-      Actions.home();
-    }
+  constructor() {
+      super();
+      this.state = {
+        username: '',
+        password: '',
+      };
   }
+
+    redirectAuthentication = () => {
+	if (this.props.isAuthenticated) {
+	    Actions.home({"type": ActionConst.RESET});
+	}
+    }
+    
+  componentDidUpdate() {
+      this.redirectAuthentication();
+  }
+
+    componentDidMount(){
+	this.redirectAuthentication(); 
+    }
+    
   saveItem = async (item, selectedValue) => {
     console.log('Saving item', item);
     /*
@@ -78,7 +90,7 @@ class LoginScreen extends Component {
         </View>
       );
     } else {
-      return <View><Text>Already logged in</Text></View>;
+	return <View><Text>Already logged in. Please wait.</Text></View>;
     }
   }
 }
@@ -88,14 +100,14 @@ const mapStateToProps = ({authReducer}) => ({
   isLoading: authReducer.isLoading,
 });
 
-/*
+
 const loginAction = (user) => ({
   type: 'LOGIN',
   payload: {
     user: user,
   },
 });
-*/
+
 
 //const mapDispatchToProps
 //export default LoginScreen;

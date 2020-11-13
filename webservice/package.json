@@ -1,0 +1,11 @@
+{
+  "name": "fitbuddy-webapi",
+  "version": "1.0.0",
+  "description": "REST API Services for FitBuddy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "z90lives",
+  "license": "ISC"
+}

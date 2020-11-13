@@ -6,3 +6,7 @@ export const loginAction = (user) => ({
     user: user,
   },
 });
+
+export default {
+    loginAction
+};

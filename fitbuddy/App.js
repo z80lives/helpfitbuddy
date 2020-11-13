@@ -12,37 +12,31 @@ import store from './redux/store';
 
 const ConnectedRouter = connect()(Router);
 
-const App = () => (
+export const App = () => (
   <Provider store={store}>
     <ConnectedRouter>
       <Stack key="root">
-        <Scene
-          component={LoginScreen}
-          hideNavBar={true}
-          initial={true}
-          key="login"
-          title="Login"
+          <Scene
+            component={LoginScreen}
+            hideNavBar={true}
+            initial={true}
+            key="login"
+            title="Login"
         />
-        <Scene
-          key="home"
-          component={HomeScreen}
-          title="Home"
-          hideNavBar={true}
-        />
+          <Scene
+              key="home"
+              component={HomeScreen}
+              title="Home"
+              hideNavBar={true}	    
+          />
         <Scene key="register" component={RegisterScreen} title="Register" />
       </Stack>
     </ConnectedRouter>
   </Provider>
 );
 
-    }
-        />
-          </SafeAreaView>
-          
-        );
-        <View>Hothaifa</View>
-      }
-
+export default App;
+/*
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -50,5 +44,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
-});
+});*/
             

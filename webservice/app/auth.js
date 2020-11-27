@@ -2,22 +2,29 @@
 const expressjwt = require('express-jwt');
 const tokenmanager = require("./utils/token_manager.js");
 
+const UserModel = require("../models/user");
+const bcrypt = require("bcrypt-nodejs");
 
 function authServices(app) {
 
     //GENERAL USER LOGIN CALL
-    app.post("/user/login", (req, res) => {
+    app.post("/user/login", async (req, res) => {
 	//res.send(200).send("Login in as user");
 	const data = req.body;
 
-	const verifyUser = data.username == "user1";
-	const verifyPassword = data.password == "1234"	
-
+	const user = await UserModel.User.findOne({username: data.username});
+	console.log("data", data);
+	console.log("User", user);
+	
+	const verifyUser = user != null;
+	const verifyPassword = user && 	bcrypt.compareSync(data.password, user.hash);
+	const userData = user.toJSON();
+	delete userData["hash"];
+	delete userData["image"];
 	if(verifyUser && verifyPassword){
 	    const payload = {
-		user: {
-		    name: data.username,
-		    type: "gymuser"
+		user: {		    
+		    ...userData
 		}
 	    };
 	    let access_token  = tokenmanager.create_jwt_token(
@@ -29,15 +36,9 @@ function authServices(app) {
 		"message": "Successfully signed in",
 		"token" : access_token
 	    });    
-	}else{
-	    //Create an appropriate sign in message (for debugging purpose): remove this before release
-	    const message = "Cannot sign in: "+
-		  (verifyUser? "" : "Incorrect user ")+
-		  ((!verifyUser&&!verifyPassword)?"and ":"")+
-		  (verifyPassword? "" : "Incorrect password");
-	    
-	    //const message = "Incorrect username or password";
-	    res.json({"message": message});
+	}else{	    
+	    const message = "Incorrect username or password";
+	    res.status(401).json({"message": message});
 	}
 	
     });
@@ -50,7 +51,7 @@ function authServices(app) {
 	    return res.status(200).
 		json({
 		    "message": "User is logged in",
-		    ...req.user.user
+		    user: req.user.user
 		});
 	};
 	res.status(403).json({"message": "User not logged in"});
@@ -77,11 +78,41 @@ function authServices(app) {
 	res.status(403).json({"message": "Unauthorized API Call"});
     });
 
+    //retrieve profile picture given id (GLOBAL)
+    app.post("/picture", async (req, res) => {
+	const _id = req.body._id;
+	const user = await UserModel.User.findOne({"_id": _id});
+
+	res.status(200).json({"message": "OK", image: user.image})
+						  
+    });
     
 
     //GYM USER CREATE CALL
     app.post("/user/register", (req, res) => {
-	res.json({"message": "Logging in"});
+	const data = req.body;
+	const hash = bcrypt.hashSync(data.password);
+	const newUser = UserModel.User({...data, hash});	
+
+	newUser.save( (err) => {
+	    if(!err)
+		res.json({"message": "Signup success!"});
+	    else
+		res.json({"message": "Failed to signup"})
+	});
+    });
+
+    app.get("/users", async (req, res) => {
+	const data = await UserModel.User.find().select('-image');;
+	res.json({"message": "Listing users", data})
+    });
+
+
+    app.delete("/users", async (req, res) => {
+	await UserModel.User.remove({}, function(err) { 
+	    console.log('collection removed') 
+	});	
+	res.json({"message": "User data deleted"});
     });
 }
 

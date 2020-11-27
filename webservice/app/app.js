@@ -6,9 +6,20 @@ const expressjwt = require('express-jwt');
 
 var cookieParser = require('cookie-parser')
 
+const mongoose = require('mongoose');
+
+const connectDb =  () => {
+  return mongoose.connect("mongodb://localhost/stayfitdb");
+};
+
+const authMiddleware = require("./middleware/auth");
+
+connectDb();
+
+//app.use(express.bodyParser({limit: '50mb'})); 
 
 //app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
@@ -16,10 +27,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/gymuser", (req, res, next)=>{
     console.log("gym user", "middleware");
     //res.status(401).send("Invalid token");
-    next();
+oo    next();
 });*/
 
-app.use(["/login", "/gymuser"], expressjwt({ secret: 'secret1', algorithms: ['HS256'] }) )
+app.use(["/login", "/gymuser"],
+	expressjwt({ secret: 'secret1', algorithms: ['HS256'] }));
+
+
+app.use(["/gymuser"], authMiddleware);
+	
 //app.use("/gymuser", expressjwt({ secret: 'secret1', algorithms: ['HS256'] }) )
 
 
@@ -28,7 +44,6 @@ app.get("/", (req, res) => {
 });
 
 require("./gymuser")(app);
-
 require("./auth")(app);
 
 module.exports = app;

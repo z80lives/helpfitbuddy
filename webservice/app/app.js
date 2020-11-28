@@ -40,7 +40,7 @@ app.use(["/gymuser"], authMiddleware);
 
 
 app.get("/", (req, res) => {
-    res.send(200).send("100: AOK!");
+    res.status(200).send("100: AOK!");
 });
 
 require("./gymuser")(app);

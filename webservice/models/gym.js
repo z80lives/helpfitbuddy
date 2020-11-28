@@ -26,7 +26,7 @@ const GymSchema = new mongoose.Schema({
     }
 });
 
-const Gym = mongoose.model('Gym', userSchema);
+const Gym = mongoose.model('Gym', GymSchema);
  
 module.exports =  Gym;
 

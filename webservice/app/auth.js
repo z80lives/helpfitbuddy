@@ -12,15 +12,27 @@ function authServices(app) {
 	//res.send(200).send("Login in as user");
 	const data = req.body;
 
+	if(data.username==""){
+	    res.status(401).send({message: "Empty username"});
+	}
+	if(data.password==""){
+	    res.status(401).send({message: "Empty password"});
+	}
+
 	const user = await UserModel.User.findOne({username: data.username});
-	console.log("data", data);
-	console.log("User", user);
-	
+
 	const verifyUser = user != null;
+	
+	if(!verifyUser){
+	    res.status(401).send({message: "Incorrect username"});
+	    return;	    
+	}
+	
 	const verifyPassword = user && 	bcrypt.compareSync(data.password, user.hash);
 	const userData = user.toJSON();
 	delete userData["hash"];
 	delete userData["image"];
+
 	if(verifyUser && verifyPassword){
 	    const payload = {
 		user: {		    

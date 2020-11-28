@@ -30,20 +30,20 @@ app.use("/gymuser", (req, res, next)=>{
 oo    next();
 });*/
 
-app.use(["/login", "/gymuser"],
+app.use(["/login", "/gymuser", "/gym"],
 	expressjwt({ secret: 'secret1', algorithms: ['HS256'] }));
 
-
-app.use(["/gymuser"], authMiddleware);
+app.use(authMiddleware.handleError);
+//app.use(["/gymuser", "/gym"], authMiddleware);
 	
 //app.use("/gymuser", expressjwt({ secret: 'secret1', algorithms: ['HS256'] }) )
-
 
 app.get("/", (req, res) => {
     res.status(200).send("100: AOK!");
 });
 
 require("./gymuser")(app);
+require("./controllers/gym")(app);
 require("./auth")(app);
 
 module.exports = app;

@@ -6,8 +6,30 @@ const authUser = async (req, res, next) => {
     req.locals = {
 	currentUser: currentUser
     };
-    //console.log("Auth middleware");
+
+    /*
+    if(err.name === 'UnauthorizedError') {
+      res.status(err.status).send({message:err.message});
+      logger.error(err);
+      return;
+    }*/
+    
+    console.log("Auth middleware");
     next();
 }
 
-module.exports = authUser;
+const handleError = function(err, req, res, next) {
+    if(err.name === 'UnauthorizedError') {
+	res.status(err.status).send({message:err.message});
+	logger.error(err);
+	return;
+    }
+    next();
+};
+
+
+
+module.exports = {
+    authUser,
+    handleError
+};

@@ -66,6 +66,7 @@ module.exports =  function gymUserServices(app){
 		    "distance": "13"
 		};	   
 	}).filter(el => el !=null);
+	
 	res.status(200).json({
 	    "message": "Gym user list",
 	    data: processedList

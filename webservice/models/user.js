@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema(
 	  type: String,
 	  required: false
       }],
+      country: {
+	      type: String,
+	      required: false
+      },
       dob: [{
 	  type: String,
 	  required: false
@@ -34,7 +38,15 @@ const userSchema = new mongoose.Schema(
       location: [{
 	  type: String,
 	  required: false
-      }]
+      }],
+      bio: {
+	type: String,
+	required: false
+      },
+      occupation: {
+	type: String,
+	required: false
+      }
   },
   { timestamps: true },
 );

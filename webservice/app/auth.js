@@ -102,16 +102,16 @@ function authServices(app) {
 
     //GYM USER CREATE CALL
     app.post("/user/register", (req, res) => {
-	const data = req.body;
-	const hash = bcrypt.hashSync(data.password);
-	const newUser = UserModel.User({...data, hash});	
+		const data = req.body;
+		const hash = bcrypt.hashSync(data.password);
+		const newUser = UserModel.User({...data, hash});	
 
-	newUser.save( (err) => {
-	    if(!err)
-		res.json({"message": "Signup success!"});
-	    else
-		res.json({"message": "Failed to signup"})
-	});
+		newUser.save( (err) => {
+			if(!err)
+			res.json({"message": "Signup success!"});
+			else
+			res.status(401).json({"message": "Failed to signup"})
+		});
     });
 
     app.get("/users", async (req, res) => {

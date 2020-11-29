@@ -39,7 +39,7 @@ app.use(authMiddleware.handleError);
 //app.use("/gymuser", expressjwt({ secret: 'secret1', algorithms: ['HS256'] }) )
 
 app.get("/", (req, res) => {
-    res.send(200).send("100: AOK!");
+    res.status(200).send("100: AOK!");
 });
 
 require("./gymuser")(app);

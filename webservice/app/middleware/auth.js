@@ -14,14 +14,14 @@ const authUser = async (req, res, next) => {
       return;
     }*/
     
-    console.log("Auth middleware");
+    //console.log("Auth middleware");
     next();
 }
 
 const handleError = function(err, req, res, next) {
     if(err.name === 'UnauthorizedError') {
 	res.status(err.status).send({message:err.message});
-	logger.error(err);
+	console.error(err);
 	return;
     }
     next();

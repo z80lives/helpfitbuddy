@@ -5,7 +5,7 @@ const create_jwt_token = (payload) => {
 		    "secret1",
 		    {
 			algorithm: "HS256",
-			expiresIn: 60 * 20
+			expiresIn: 60* 60 * 2 //60 * 20
 			
 		    });
 }

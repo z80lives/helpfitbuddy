@@ -44,6 +44,8 @@ app.get("/", (req, res) => {
 
 require("./gymuser")(app);
 require("./controllers/gym")(app);
+require("./controllers/event")(app);
+require("./controllers/friends")(app);
 require("./auth")(app);
 
 module.exports = app;

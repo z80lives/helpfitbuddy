@@ -77,7 +77,7 @@ function authServices(app) {
 	    const data = req.user.user;
 	    const newToken = tokenmanager.create_jwt_refresh_token({
 		user: {
-		    name: data.username
+		    ...data
 		}
 	    });
 	    

@@ -27,7 +27,7 @@ module.exports = function friendServices(app){
 		  ...friend,
 		  distance: getDistance(friend.location, myLocation).toString(),
 	      }) );
-	;
+
 	
 	res.json({
 	    "message": "Friend list",
@@ -38,9 +38,16 @@ module.exports = function friendServices(app){
 
     app.get("/gymuser/requests", async (req, res) => {
 	const friendship = await initFriendRequest(req.user.user._id);
+
+	const data = await friendship.populate("friend_requests").execPopulate();
+	const processedList =
+	      data
+	      .friend_requests
+	      .map(processUser);
+	
 	res.json({
 	    "message": "Pending requests",
-	    friend_requests: friendship.friend_requests
+	    friend_requests: processedList
 	});
     });
 
@@ -49,17 +56,19 @@ module.exports = function friendServices(app){
 	const _id = req.user.user._id;
 	const other_user = await User.findOne({_id: req.body._id});
 	const friendship = await initFriendRequest(req.body._id);
+	console.log("Body", req.body);
 
 	if(req.body._id == req.user.user._id){
 	    res.status(500).json({
 		"message": "Cannot send friend request to self"
 	    });
+	    return
 	}
-	
+
 	//delete other_user["image"];	
 	//console.log(other_user)
 	if(!other_user){
-	    res.status(500).json({"message": "User does not exist"});
+	    res.status(500).json({"message": "User does not exist "+req.body._id, sent: req.body});
 	    return;	    
 	}
 

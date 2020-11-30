@@ -6,7 +6,7 @@ const UserModel = require("../models/user");
 const bcrypt = require("bcrypt-nodejs");
 
 function authServices(app) {
-
+    
     //GENERAL USER LOGIN CALL
     app.post("/user/login", async (req, res) => {
 	//res.send(200).send("Login in as user");

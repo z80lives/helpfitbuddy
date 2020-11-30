@@ -1,22 +1,41 @@
 const User = require("../models/user").User;
+const Friends = require("../models/friends");
 const gps = require("./utils/gps.js");
 
+const {friendRequestExists, initFriendRequest} = require("./utils/friends");
+
+const {processUser} = require("./utils/user");
+
+
 module.exports =  function gymUserServices(app){
+    
     app.get("/gymuser/", (req, res) => {
 	res.status(200).send("OK");
     });
 
     app.post("/gymuser/profile", async (req, res) => {
 	const _id = req.body._id;
-
+	
 	const user = await User.findOne({"_id": _id});
 	user.hash= null;
-	if(user){
+
+	
+	if(user){	    
+	    const my_friendships = await initFriendRequest(req.user.user._id);
+	    const their_friendships = await initFriendRequest(_id);	 
+	    const processedUser = processUser(user)
 	    res.status(200).json({
-		userData: user,
+		userData: {
+		    ...processedUser
+		},
 		extra: {
-		    "friendMode": true
-		}
+		    "friendMode": true,
+		    "isfriend": my_friendships.friends.includes(_id),
+		    "friendRequestExists": friendRequestExists(
+			my_friendships,
+			their_friendships
+		    )
+		}		
 	    });
 	}else{
 	    ress.status(500).json({"message": "failed to retrieve user"});

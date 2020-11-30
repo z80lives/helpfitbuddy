@@ -88,6 +88,8 @@ module.exports =  function gymUserServices(app){
 	});
 	
     });
+
+    
     
     app.get("/gymuser/neighbors", async (req, res) => {
 	const userList = await User.find();	

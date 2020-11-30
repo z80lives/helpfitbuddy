@@ -1,4 +1,5 @@
 const Friends = require("../../models/friends.js");
+const User = require("../../models/user.js");
 
 const initFriendRequest = async (_id) => {
     const requests = await Friends.findOne({user: _id});
@@ -13,6 +14,10 @@ const initFriendRequest = async (_id) => {
     }else{
 	return requests;
     };
+}
+
+const populateFriendList = async (friendship) => {
+    return await friendship.populate("friends").execPopulate();
 }
 
 const removeFriendRequest = (friendship1, friendship2) => {

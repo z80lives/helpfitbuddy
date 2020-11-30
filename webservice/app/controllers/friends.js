@@ -2,17 +2,37 @@ const validate = require("../utils/validate.js");
 const Friends = require("../../models/friends.js");
 const User = require("../../models/user.js").User;
 
+const {processUser, getDistance} = require("../utils/user.js");
+
 const {initFriendRequest,
        friendRequestExists,
        hasPendingRequest,
        removeFriendRequest,
-       addFriend
+       addFriend,
+       populateFriendList
       } = require("../utils/friends");
 
 module.exports = function friendServices(app){
-    app.get("/gymuser/friends", (req, res) => {
+    app.get("/gymuser/friends", async (req, res) => {
+	const friendship = await initFriendRequest(req.user.user._id)
+
+	const myLocation = req.user.user.location.length==0?[]:JSON.parse(req.user.user.location);
+
+	const data = await friendship
+	      .populate("friends", ["name", "dob", "activities", "location", "occupation", "country"]).execPopulate();
+	
+	const friends = data.friends
+	      .map(processUser)
+	      .map(friend => ({
+		  ...friend,
+		  distance: getDistance(friend.location, myLocation).toString(),
+	      }) );
+	;
+	
 	res.json({
-	    "message": "Friends"
+	    "message": "Friend list",
+	    friends,
+	    myLocation
 	});
     });
 
@@ -29,6 +49,12 @@ module.exports = function friendServices(app){
 	const _id = req.user.user._id;
 	const other_user = await User.findOne({_id: req.body._id});
 	const friendship = await initFriendRequest(req.body._id);
+
+	if(req.body._id == req.user.user._id){
+	    res.status(500).json({
+		"message": "Cannot send friend request to self"
+	    });
+	}
 	
 	//delete other_user["image"];	
 	//console.log(other_user)
@@ -71,7 +97,7 @@ module.exports = function friendServices(app){
 		     })
 	}
     });
-    
+
 
     app.delete("/friends", async (req, res) => {
 	await Friends.remove({}, function(err) { 

@@ -46,6 +46,7 @@ require("./gymuser")(app);
 require("./controllers/gym")(app);
 require("./controllers/event")(app);
 require("./controllers/friends")(app);
+require("./controllers/messaging")(app);
 require("./auth")(app);
 
 module.exports = app;

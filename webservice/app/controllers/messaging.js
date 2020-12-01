@@ -72,6 +72,16 @@ module.exports =  function messageingServices(app){
 	res.json({"message": "messaging data cleared"});
     });
 
+
+    //retrieve inbox
+    app.get("/gymuser/messages/inbox", async(req, res) => {
+	const message_box = await MessageInbox.find({user: req.user.user._id}).populate("MessageThread");
+
+	res.json({"message": "Inbox loaded",
+		  data: message_box});
+	
+    });
+
     
     //retrieve messages
     app.get("/gymuser/messages", async (req, res) => {
@@ -91,12 +101,13 @@ module.exports =  function messageingServices(app){
 
 	
 	const msgThread = await fetchMsgThread([req.body.recipient, req.user.user._id]);
+	msgThread.populate("messages").execPopulate();
 	const inboxes = await initInboxes(msgThread);
 	//const 
 	
 	res.json({
 	    "message": "Private thread created",
-	    msgThread,
+	    data: msgThread,
 	    inboxes
 	});
     });

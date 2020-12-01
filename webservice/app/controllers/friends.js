@@ -96,7 +96,7 @@ module.exports = function friendServices(app){
 		      });
 	}else{
 	    addFriend(ownFriendship, req.body._id);
-	    addFriend(senderFriendship, req.body._id);
+	    addFriend(senderFriendship, req.user.user._id);
 	    removeFriendRequest(ownFriendship, senderFriendship);
 	    await ownFriendship.save();
 	    await senderFriendship.save();

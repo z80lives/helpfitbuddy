@@ -1,30 +1,67 @@
 const validate = require("../utils/validate.js");
 const Event = require("../../models/event.js");
 
+const {dateFormat} = require("../utils/date");
+
 module.exports = function eventServices(app){
-    //lists user events
+    //list events for a selected user
+    app.post("/gymuser/event/user", async (req, res) => {
+	const events = await Event.find({creator: req.body._id});
+
+	res.json({"message": "Success", events, body: req.body})
+    });
+
+    app.post("/gymuser/event/join", async (req, res) => {
+	const _id = req.user.user._id;
+	const event = await Event.findOne({_id: req.body._id});
+	
+	if(event.participants.includes(_id)){
+	    res.status(500).json({"message":"User already in event"});
+	    return;
+	}else{
+	    event.participants.push(_id);
+	    await event.save();
+	}
+	
+	res.json({"message": "Successfully joined!" + _id, event});
+    });
+
+    app.delete("/gymuser/event", async (req, res) => {
+	const _id = req.body._id;
+	/*await Event.remove({}, function(err) { 
+	    console.log('collection removed') 
+	});	*/
+	res.json({"message": "Deleting event "+_id});
+    });
+    
+    //lists user events for agenda view
     app.get("/gymuser/event", async (req, res) => {
-	const createdevents = await Event.find({creator: req.user.user._id});
-	const participatingEvents = await Event.find({participants: req.user._id});
+	const _id = req.user.user._id;
+	const createdevents = await Event.find({creator: req.user.user._id}).populate("gym", 'name');
+	//await createdevents.populate("gym").execPopulate();
+	const participatingEvents = await Event.find({participants: req.user.user._id}).populate("gym", "name");
+	
+	//await participatingEvents.populate("gym").execPopulate();
 	const myEvents = [...createdevents, ...participatingEvents];
 	
 	const eventMap = {};
-	myEvents.forEach( event => {
+	myEvents.forEach( async event => {
+	    var dateStr = dateFormat(new Date(event.date));
+
+	    event.date = dateStr;
+	    const selfCreated = event.creator == req.user.user._id;
 	    if(!eventMap[event.date])
 		eventMap[event.date] = [];
-	    eventMap[event.date].push(event);
+	    eventMap[event.date].push({...event.toJSON(), selfCreated});
 	});
-	
+
+	const filtered = participatingEvents.map(e => {
+	    return {
+		p: e.participants.includes(_id)
+	    };
+	});
 	res.json({
 	    "message": "Event list",
-	    "events": [
-		{
-		    '2020-11-16': [
-			{name: 'item 1 - any js object', "time": "09:00"},
-			
-		    ]
-		}
-	    ],
 	    events: eventMap
 	});
     });
@@ -55,6 +92,7 @@ module.exports = function eventServices(app){
 
 	res.json(events);
     });
+   
 
     app.delete("/events", async (req, res) => {
 	await Event.remove({}, function(err) { 

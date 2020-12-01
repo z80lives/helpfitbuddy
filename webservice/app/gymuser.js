@@ -4,7 +4,7 @@ const gps = require("./utils/gps.js");
 
 const {friendRequestExists, initFriendRequest} = require("./utils/friends");
 
-const {processUser} = require("./utils/user");
+const {processUser, getDistance} = require("./utils/user");
 
 
 module.exports =  function gymUserServices(app){
@@ -13,6 +13,9 @@ module.exports =  function gymUserServices(app){
 	res.status(200).send("OK");
     });
 
+    
+
+    //retrieve another user's profile
     app.post("/gymuser/profile", async (req, res) => {
 	const _id = req.body._id;
 	
@@ -31,6 +34,7 @@ module.exports =  function gymUserServices(app){
 		extra: {
 		    "friendMode": true,
 		    "isfriend": my_friendships.friends.includes(_id),
+		    "friends": my_friendships.friends,
 		    "friendRequestExists": friendRequestExists(
 			my_friendships,
 			their_friendships
@@ -111,7 +115,29 @@ module.exports =  function gymUserServices(app){
     
     
     app.get("/gymuser/neighbors", async (req, res) => {
-	const userList = await User.find();	
+	const userList = await User.find();
+	const myLocation = req.user.user.location.length==0?[]:JSON.parse(req.user.user.location);
+	
+	const processedList = userList
+	      .map(processUser)
+	      .map(el =>{
+		  const distance = (el.location.coords!=null && myLocation.coords !=null)?
+			getDistance(el.location, myLocation).toString()
+			:
+			null;		  
+		  
+		  if(el._id != req.user.user._id)
+		      return {
+			  "name": el.name,
+			  "image": el.image,
+			  "_id": el._id,
+			  "distance": distance,
+			  "age": el.age,
+			  "country": el.country
+		      };
+	      }).filter(el => el!=null);
+
+	/*
 	const processedList = userList.map(el => {
 	    var e = el;
 	    
@@ -123,8 +149,10 @@ module.exports =  function gymUserServices(app){
 	    }
 
 	    const distance = 0;
+	    //if(el.location.length != 0 && req.body.
 
-	    //calculate distance -- Horrible code. Don't fix.	    
+	    //calculate distance -- Horrible code. Don't fix.
+	    /*
 	    if(el.location.length > 0){
 		const userLocation = req.user.user.location;
 		if(userLocation.length > 0){
@@ -142,7 +170,7 @@ module.exports =  function gymUserServices(app){
 			console.error(ex);
 		    }
 		}
-	    }
+	    }/
 	    
 	    if(el._id != req.user.user._id)
 		return {
@@ -152,7 +180,7 @@ module.exports =  function gymUserServices(app){
 		    "age": age,
 		    "distance": distance
 		};	   
-	}).filter(el => el !=null);
+	}).filter(el => el !=null); */
 	
 	res.status(200).json({
 	    "message": "Gym user list",
